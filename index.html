@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FACTORS THAT INFLUENCE STUDENTS USING AI FOR ILLUSTRATION AND DESIGN - 3D Defense Game</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+  body{background:#0a0a1a;color:#fff;overflow:hidden}
+  #game{position:fixed;inset:0;z-index:1}
+  .top{position:fixed;top:0;left:0;right:0;z-index:10;background:linear-gradient(180deg,rgba(0,0,0,.9),transparent);padding:12px;display:flex;justify-content:space-between;flex-wrap:wrap}
+  .top b{color:#ffe600}
+  .slide-panel{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#11152e;border-top:3px solid #00ffcc;padding:16px;max-height:58vh;overflow:auto}
+  .slide-panel h2{color:#00ffcc;font-size:22px}
+  .slide-panel p{font-size:17px;line-height:1.6;margin:10px 0}
+  .btn{background:#ffe600;border:none;padding:11px 16px;border-radius:10px;font-weight:bold;cursor:pointer;margin:4px}
+  .btn2{background:#00ffcc;border:none;padding:11px 16px;border-radius:10px;font-weight:bold;cursor:pointer;margin:4px}
+  .btn3{background:#ff3b6b;color:#fff;border:none;padding:11px 16px;border-radius:10px;font-weight:bold;cursor:pointer;margin:4px}
+  .pill{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:bold;margin:3px;background:#222;border:1px solid #444}
+  .progress{height:12px;background:#222;border-radius:10px;overflow:hidden;margin:8px 0}
+  .fill{height:100%;background:linear-gradient(90deg,#00ffcc,#ffe600);width:5%;transition:width .4s}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  td,th{padding:8px;border:1px solid #333;text-align:left} th{background:#1a2347}
+  .qbox{background:#1c2747;padding:14px;border-radius:14px;margin:10px 0}
+  .stars button{font-size:26px;background:none;border:none;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="game"></div>
+
+<div class="top">
+  <div><b>THESIS DEFENSE - 3D GAME</b><br><small>Factors That Influence Students Using AI for Illustration and Design</small><br>Researcher: <b>Ian Patrick C. Batungbacal</b> | 2021-1-02203 | AB Multimedia Arts</div>
+  <div>Slide: <b id="slideNum">1 / 19</b><br><div class="progress" style="width:220px"><div class="fill" id="fill"></div></div>Controls: <b>WASD + Mouse</b> | <b>E</b> = Answer</div>
+  <div>Score: <b id="score">0</b><br>Zone: <b id="zoneName">Opening</b></div>
+</div>
+
+<div class="slide-panel" id="panel">
+  <div id="slideContent"></div>
+  <div style="margin-top:10px">
+    <button class="btn2" onclick="prevSlide()">← Prev Slide</button>
+    <button class="btn" onclick="nextSlide()">Next Slide Please →</button>
+    <button class="btn3" onclick="showSurvey()">🎮 Play Survey Game (30 Questions)</button>
+    <button class="btn2" onclick="showResults()">📊 Show Results Dashboard</button>
+  </div>
+  <div id="extra"></div>
+</div>
+
+<script>
+// ---------- YOUR 19 SLIDES - EXACT SCRIPT ----------
+const SLIDES = [
+  {title:"SLIDE 1 - Opening", zone:"Opening", script:`Good morning to our dearest panelists, may I present to you my thesis slideshow preview for my topic entitled <b>Factors that influence students using Artificial Intelligence for Illustration and Design</b> then later on let us show you my discussion on this thesis defense. Next slide please.`},
+  {title:"SLIDE 2 - Introduction", zone:"Introduction", script:`AI helps students accelerate creative work, but this study examines its full impact on their skills, opportunities, and risks. Next slide please.`},
+  {title:"SLIDE 3 - AI Tools Evaluated", zone:"AI Tools", script:`For the AI tools evaluated in this study: <br><b>ChatGPT</b> is used for generating images, ideas, and prompts. <br><b>Google Gemini</b> is used for generating images and creative ideas. <br><b>Adobe Firefly</b> is used for generating and editing images. <br>And <b>Canva AI</b> is used for creating posters, presentations, and graphic designs. Next slide please.`},
+  {title:"SLIDE 4 - Background", zone:"Background", script:`According to recent reports, <b>42.4% of Filipino internet users</b> and <b>83% of Filipino students use AI (ASEAN Foundation, 2026)</b>. Thus, this study promotes responsible AI use, examining how it impacts students' creativity, originality, and design skills. Next slide please.`},
+  {title:"SLIDE 5 - Objectives", zone:"Objectives", script:`For the objectives: <b>to identify the factors, relationships, benefits, and disadvantages of AI use.</b> Next slide please.`},
+  {title:"SLIDE 6 - Research Questions", zone:"Questions", script:`The study is guided by questions on <b>AI usage, its impacts, and how students balance it with their manual skills.</b> Next slide please.`},
+  {title:"SLIDE 7 - Scope & Limitations", zone:"Scope", script:`For the scope and limitations: <b>30 LPU Multimedia Arts students, using simple regression.</b> Next slide please.`},
+  {title:"SLIDE 8 - Tools Analysis", zone:"Tools Analysis", script:`For the tools evaluated: we analyzed <b>ChatGPT for brainstorming, Gemini for reasoning and editing, Canva AI for layouts, and Adobe Firefly for commercial-safe professional design.</b> Next slide please.`},
+  {title:"SLIDE 9 - Theoretical Framework - TAM", zone:"TAM Framework", script:`For the theoretical framework: <b>TAM focuses on perceived usefulness and perceived ease of use.</b> Next slide please.`},
+  {title:"SLIDE 10 - Questionnaire", zone:"Questionnaire", script:`The questionnaire consists of <b>30 items across 10 thematic areas.</b> Next slide please.`},
+  {title:"SLIDE 11 - Research Model", zone:"Model", script:`The model tests these <b>9 variables leading to AI use.</b><br><span class="pill">UP - Perceived Usefulness</span><span class="pill">CR - Creativity</span><span class="pill">LS - Learning & Confidence</span><span class="pill">DQ - Design Quality</span><span class="pill">SI - Social Influence</span><span class="pill">AF - Accessibility</span><span class="pill">TF - Traditional Preference</span><span class="pill">ET - Ethical Use</span><span class="pill">Intention to Use</span> Next slide please.`},
+  {title:"SLIDE 12 - Demographics", zone:"Demographics", script:`For the demographics: <b>26 MMA student respondents, consisting of 12 males and 14 females.</b> Next slide please.`},
+  {title:"SLIDE 13 - Findings: Usage", zone:"Findings 1", script:`Findings show <b>frequent AI use for creative tasks, study content, and devices.</b> Most use Desktop/Laptop, for Design, Drawing, Illustration. Next slide please.`},
+  {title:"SLIDE 14 - Findings: Proficiency & Tools", zone:"Findings 2", script:`Results show <b>proficiency, preferred tools, and impact on creativity.</b> Most are Intermediate, most preferred: ChatGPT > Canva > Gemini > Firefly. Next slide please.`},
+  {title:"SLIDE 15 - Findings: Originality & Motivation", zone:"Findings 3", script:`Results cover <b>originality, proficiency, motivation, and frequency of use.</b> Motivations: Speed, Convenience, Improves Learning, Free. Next slide please.`},
+  {title:"SLIDE 16 - Findings: Hours & Experience", zone:"Findings 4", script:`Results also show <b>daily hours spent and years of experience using AI.</b> Most use 1-2 hours per day, 1-2 years experience. Next slide please.`},
+  {title:"SLIDE 17 - Findings: Regression", zone:"Regression Results", script:`<b>24 variables show a significant relationship with intention to use AI, while 5 variables show no significant relationship.</b> This means most factors like Usefulness, Creativity, Learning, and Design Quality strongly influence students. Next slide please.`},
+  {title:"SLIDE 18 - Conclusion", zone:"Conclusion", script:`In conclusion, <b>AI may improve creativity and productivity.</b> But students must balance it with manual skills to keep originality. Next slide please.`},
+  {title:"SLIDE 19 - Recommendations & Q&A", zone:"Q&A", script:`For recommendations, <b>use AI responsibly and maintain creativity.</b> To be continued next slide please.<br><br><b>Any further suggestions, reviews, comments, feedback, violent reactions etc. If none you there panelists you may now be allowed to answer my thesis questions. That's the end of my defense thank you!</b>`},
+];
+
+const QUESTIONS = [
+  {n:1,theme:"UP",text:"Artificial Intelligence helps me create designs more easily."},
+  {n:2,theme:"UP",text:"Artificial Intelligence saves me time when working on illustration and design projects."},
+  {n:3,theme:"CR",text:"Artificial Intelligence helps me come up with new ideas for my illustration and design projects."},
+  {n:4,theme:"UP",text:"Artificial Intelligence makes the design process more convenient for me."},
+  {n:5,theme:"CR",text:"Artificial Intelligence improves the quality of my ideas for illustration and design projects."},
+  {n:6,theme:"LS",text:"Artificial Intelligence helps me create designs even when I have limited design skills."},
+  {n:7,theme:"UP",text:"Artificial Intelligence allows me to complete design tasks faster."},
+  {n:8,theme:"DQ",text:"Artificial Intelligence helps me select appropriate layouts and design elements."},
+  {n:9,theme:"DQ",text:"Artificial Intelligence improves the quality of my designs."},
+  {n:10,theme:"CR",text:"Artificial Intelligence encourages me to experiment with different design ideas."},
+  {n:11,theme:"UP",text:"Artificial Intelligence helps me become more productive when creating visual materials."},
+  {n:12,theme:"LS",text:"Artificial Intelligence makes learning and practice easier."},
+  {n:13,theme:"LS",text:"Artificial Intelligence increases my confidence in creating designs."},
+  {n:14,theme:"SI",text:"My classmates influenced my decision to use Artificial Intelligence for illustration and design."},
+  {n:15,theme:"SI",text:"Recommendations from other students encourage me to use Artificial Intelligence for design tasks."},
+  {n:16,theme:"CR",text:"Artificial Intelligence supports the development of my creativity and creative thinking."},
+  {n:17,theme:"LS",text:"Artificial Intelligence helps improve my digital literacy and digital competence."},
+  {n:18,theme:"UP",text:"Artificial Intelligence helps me complete my illustration and design tasks more effectively."},
+  {n:19,theme:"CR",text:"Artificial Intelligence helps me explore and develop different ideas for my illustration and design projects."},
+  {n:20,theme:"AF",text:"Limited availability of devices can be a challenge when using Artificial Intelligence."},
+  {n:21,theme:"CR",text:"Using Artificial Intelligence helps me be more creative when working on illustration and design projects."},
+  {n:22,theme:"TF",text:"I prefer to use freehand drawing as opposed to Artificial Intelligence"},
+  {n:23,theme:"AF",text:"Artificial Intelligence is convenient to access when I work on illustration and design tasks."},
+  {n:24,theme:"LS",text:"Artificial Intelligence supports my independent learning in illustration and design."},
+  {n:25,theme:"CR",text:"I am concerned that using Artificial Intelligence decreases my sense of originality."},
+  {n:26,theme:"CR",text:"I am concerned that using Artificial Intelligence decreases my creativity."},
+  {n:27,theme:"CR",text:"I am concerned about becoming too dependent on Artificial Intelligence for design tasks."},
+  {n:28,theme:"CR",text:"I am concerned about copyright issues when using Artificial Intelligence for creative work."},
+  {n:29,theme:"ET",text:"I always disclose the use of Artificial Intelligence in my illustration and design tasks."},
+  {n:30,theme:"UP",text:"I intend to continue using Artificial Intelligence for future illustration and design projects."},
+];
+const THEMES={UP:"Perceived Usefulness & Productivity",CR:"Creativity & Idea Generation",LS:"Learning, Skills & Confidence",DQ:"Design Assistance & Quality",SI:"Social Influence",AF:"Accessibility & Facilitating Conditions",TF:"Traditional/Freehand Preference",ET:"Ethical/Transparent Use"};
+
+let cur=0, score=0, answers=JSON.parse(localStorage.getItem('thesis_answers')||'{}');
+function renderSlide(){
+  let s=SLIDES[cur];
+  document.getElementById('slideContent').innerHTML=`<h2>${s.title}</h2><p>${s.script}</p><p style="font-size:13px;opacity:.6">Say: "Next slide please" then click Next. Researcher: Ian Patrick C. Batungbacal | 2021-1-02203 | AB Multimedia Arts</p>`;
+  document.getElementById('slideNum').textContent=`${cur+1} / ${SLIDES.length}`;
+  document.getElementById('fill').style.width=((cur+1)/SLIDES.length*100)+"%";
+  document.getElementById('zoneName').textContent=s.zone;
+  document.getElementById('extra').innerHTML="";
+}
+function nextSlide(){ if(cur<SLIDES.length-1){cur++; renderSlide(); score+=10; document.getElementById('score').textContent=score;} }
+function prevSlide(){ if(cur>0){cur--; renderSlide();} }
+function showSurvey(){
+  let q=QUESTIONS[Object.keys(answers).length % 30];
+  document.getElementById('extra').innerHTML=`<div class="qbox"><b>🎮 SURVEY GAME - Question ${q.n} / 30 - ${q.theme} - ${THEMES[q.theme]}</b><p style="font-size:18px">${q.text}</p><p>1 Strongly Disagree - 5 Strongly Agree</p><div class="stars">${[1,2,3,4,5].map(n=>`<button onclick="answerQ(${q.n},${n})">⭐ ${n}</button>`).join('')}</div><p>Answered: ${Object.keys(answers).length} / 30</p></div>`;
+}
+function answerQ(n,val){ answers[n]=val; localStorage.setItem('thesis_answers', JSON.stringify(answers)); score+=val; document.getElementById('score').textContent=score; showSurvey(); if(Object.keys(answers).length>=30) showResults(); }
+function showResults(){
+  let html=`<h3>📊 Results Dashboard - For Panel Q&A</h3><table><tr><th>Factor</th><th>Mean</th><th>Interpretation</th></tr>`;
+  let means=[];
+  for(let t in THEMES){
+    let qs=QUESTIONS.filter(q=>q.theme===t);
+    let vals=qs.map(q=>answers[q.n]).filter(v=>v);
+    let mean=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2):"0.00";
+    means.push({t,mean:parseFloat(mean),name:THEMES[t]});
+    html+=`<tr><td>${t} - ${THEMES[t]}</td><td>${mean}</td><td>${mean>=4?"High Influence":mean>=3?"Moderate":"Low"}</td></tr>`;
+  }
+  means.sort((a,b)=>b.mean-a.mean);
+  html+=`</table><p><b>Top Factor:</b> ${means[0]?.t} - ${means[0]?.name} (${means[0]?.mean})</p><p><b>Regression Summary:</b> 24 variables SIGNIFICANT, 5 variables NOT SIGNIFICANT</p><p><b>Demographics:</b> 26 respondents - 12 Males, 14 Females | LPU MMA | 30 items</p><button class="btn" onclick="downloadCSV()">⬇ Download CSV for SPSS</button>`;
+  document.getElementById('extra').innerHTML=html;
+}
+function downloadCSV(){
+  let csv="Q,Theme,Statement,Answer\n"; QUESTIONS.forEach(q=>{ csv+=`${q.n},${q.theme},"${q.text}",${answers[q.n]||''}\n`; });
+  let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='thesis_results.csv'; a.click();
+}
+
+// --- THREE.JS 3D CAMPUS ---
+let scene=new THREE.Scene(); scene.background=new THREE.Color(0x0a0a1a); scene.fog=new THREE.Fog(0x0a0a1a,20,90);
+let camera=new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000); camera.position.set(0,6,14);
+let renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(innerWidth, innerHeight); document.getElementById('game').appendChild(renderer.domElement);
+scene.add(new THREE.AmbientLight(0xffffff,0.8));
+let dl=new THREE.DirectionalLight(0xffffff,0.9); dl.position.set(10,20,10); scene.add(dl);
+let ground=new THREE.Mesh(new THREE.PlaneGeometry(120,120), new THREE.MeshLambertMaterial({color:0x1a3a2a})); ground.rotation.x=-Math.PI/2; scene.add(ground);
+// 19 Buildings = 19 Slides
+let cols=[0xffe600,0x00ffcc,0xff00ff,0xff7a00,0x7a5cff,0x00ff88,0xff3b6b,0xffffff,0xffe600,0x00ffcc,0xff00ff,0xff7a00,0x7a5cff,0x00ff88,0xff3b6b,0xffe600,0x00ffcc,0xff00ff,0xffe600];
+for(let i=0;i<19;i++){
+  let b=new THREE.Mesh(new THREE.BoxGeometry(5,3+i*0.2,5), new THREE.MeshLambertMaterial({color:cols[i]}));
+  b.position.set(-30 + (i%5)*15, 1.5, -20 + Math.floor(i/5)*12); scene.add(b);
+  let top=new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshLambertMaterial({color:0xffffff}));
+  top.position.set(-30 + (i%5)*15, 4+i*0.2, -20 + Math.floor(i/5)*12); scene.add(top);
+}
+let player=new THREE.Mesh(new THREE.BoxGeometry(1,2,1), new THREE.MeshLambertMaterial({color:0x00ffcc})); player.position.set(0,1,5); scene.add(player);
+let keys={}; addEventListener('keydown',e=>{ keys[e.key.toLowerCase()]=true; if(e.key.toLowerCase()==='e') showSurvey(); });
+addEventListener('keyup',e=>{ keys[e.key.toLowerCase()]=false; });
+let mx=0; addEventListener('mousemove',e=>{ mx=(e.clientX/innerWidth-0.5)*2; });
+function animate(){ requestAnimationFrame(animate);
+  if(keys['w']) player.position.z-=0.18; if(keys['s']) player.position.z+=0.18;
+  if(keys['a']) player.position.x-=0.18; if(keys['d']) player.position.x+=0.18;
+  camera.position.set(player.position.x+mx*3, 6, player.position.z+11); camera.lookAt(player.position);
+  renderer.render(scene,camera);
+}
+animate();
+renderSlide();
+</script>
+</body>
+</html>
